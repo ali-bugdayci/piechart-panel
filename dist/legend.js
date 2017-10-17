@@ -67,6 +67,35 @@ System.register(['angular', 'app/core/utils/kbn', 'jquery', 'jquery.flot', 'jque
               render();
             }
 
+            function getLegendHeaderHtml(statName) {
+              var name = statName;
+
+              if (panel.legend.header) {
+                name = panel.legend.header;
+              }
+
+              var html = '<th class="pointer" data-stat="' + statName + '">' + name;
+
+              if (panel.legend.sort === statName) {
+                var cssClass = panel.legend.sortDesc ? 'fa fa-caret-down' : 'fa fa-caret-up';
+                html += ' <span class="' + cssClass + '"></span>';
+              }
+
+              return html + '</th>';
+            }
+
+            function getLegendPercentageHtml(statName) {
+              var name = 'percentage';
+              var html = '<th class="pointer" data-stat="' + statName + '">' + name;
+
+              if (panel.legend.sort === statName) {
+                var cssClass = panel.legend.sortDesc ? 'fa fa-caret-down' : 'fa fa-caret-up';
+                html += ' <span class="' + cssClass + '"></span>';
+              }
+
+              return html + '</th>';
+            }
+
             function openColorSelector(e) {
               // if we clicked inside poup container ignore click
               if ($(e.target).parents('.popover').length) {
@@ -81,7 +110,7 @@ System.register(['angular', 'app/core/utils/kbn', 'jquery', 'jquery.flot', 'jque
                 popoverSrv.show({
                   element: el[0],
                   position: 'bottom center',
-                  template: '<gf-color-picker></gf-color-picker>',
+                  template: '<series-color-picker series="series" onToggleAxis="toggleAxis" onColorChange="colorSelected">' + '</series-color-picker>',
                   openOn: 'hover',
                   model: {
                     autoClose: true,
@@ -104,6 +133,7 @@ System.register(['angular', 'app/core/utils/kbn', 'jquery', 'jquery.flot', 'jque
               if (firstRender) {
                 elem.append($container);
                 $container.on('click', '.graph-legend-icon', openColorSelector);
+                $container.on('click', '.graph-legend-alias', toggleSeries);
                 $container.on('click', 'th', sortLegend);
                 firstRender = false;
               }
@@ -130,10 +160,10 @@ System.register(['angular', 'app/core/utils/kbn', 'jquery', 'jquery.flot', 'jque
               if (tableLayout) {
                 var header = '<tr><th colspan="2" style="text-align:left"></th>';
                 if (panel.legend.values) {
-                  header += '<th class="pointer">values</th>';
+                  header += getLegendHeaderHtml(ctrl.panel.valueName);
                 }
                 if (panel.legend.percentage) {
-                  header += '<th class="pointer">percentage</th>';
+                  header += getLegendPercentageHtml(ctrl.panel.valueName);
                 }
                 header += '</tr>';
                 $container.append($(header));
@@ -178,7 +208,7 @@ System.register(['angular', 'app/core/utils/kbn', 'jquery', 'jquery.flot', 'jque
                 html += '</span>';
 
                 if (showValues && tableLayout) {
-                  var value = series.formatValue(series.stats[ctrl.panel.valueName]);
+                  var value = series.stats[ctrl.panel.valueName];
                   if (panel.legend.values) {
                     html += '<div class="graph-legend-value">' + ctrl.formatValue(value) + '</div>';
                   }
