@@ -152,6 +152,8 @@ System.register(['lodash', 'jquery', 'jquery.flot', 'jquery.flot.pie'], function
 
       elem.html(plotCanvas);
 
+      // @detangleEdit start
+      // @author Ali
       if (panel.lastQueryIsTotal) {
         var last = data.length - 1;
         var tillLast = 0;
@@ -160,6 +162,7 @@ System.register(['lodash', 'jquery', 'jquery.flot', 'jquery.flot.pie'], function
         }
         data[last].data -= tillLast;
       }
+      // @detangleEdit end
 
       $.plot(plotCanvas, data, options);
       plotCanvas.bind("plothover", function (event, pos, item) {

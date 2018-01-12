@@ -4,6 +4,8 @@ import kbn from 'app/core/utils/kbn';
 import $ from  'jquery';
 import 'jquery.flot';
 import 'jquery.flot.time';
+import appEvents from 'app/core/app_events';
+
 
 angular.module('grafana.directives').directive('piechartLegend', function(popoverSrv, $timeout) {
   return {
@@ -32,6 +34,25 @@ angular.module('grafana.directives').directive('piechartLegend', function(popove
 
       function toggleSeries(e) {
         var el = $(e.currentTarget);
+
+        // @detangleEdit start
+        // @author Ali
+        if(panel.lastQueryIsTotal)
+        {
+          appEvents.emit('alert-error', ['Not supported', 'Filtering is not supported for the relation graphs.']);
+          return;
+        }
+
+        if (e.shiftKey) {
+          appEvents.emit('add-selection', {
+            field: panel.targets[0].bucketAggs[0].field,
+            value: el.text()
+          });
+          
+          return;
+        }
+        // @detangleEdit end
+
         var index = getSeriesIndexForElement(el);
         var seriesInfo = seriesList[index];
         var scrollPosition = $($container.children('tbody')).scrollTop();
@@ -130,6 +151,8 @@ angular.module('grafana.directives').directive('piechartLegend', function(popove
           firstRender = false;
         }
 
+        // @detangleEdit start
+        // @author Ali
         if(panel.lastQueryIsTotal)
         {
           //Make a copy of it since sorting after rendering breaks data
@@ -144,6 +167,7 @@ angular.module('grafana.directives').directive('piechartLegend', function(popove
         }
         else
           seriesList = data;
+        // @detangleEdit end
 
         $container.empty();
 

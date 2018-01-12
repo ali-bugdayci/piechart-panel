@@ -147,6 +147,8 @@ export default function link(scope, elem, attrs, ctrl) {
 
     elem.html(plotCanvas);
 
+    // @detangleEdit start
+    // @author Ali
     if(panel.lastQueryIsTotal)
     {
       var last = data.length-1;
@@ -156,6 +158,7 @@ export default function link(scope, elem, attrs, ctrl) {
       }
       data[last].data -= tillLast;   
     }
+    // @detangleEdit end
     
     $.plot(plotCanvas, data, options);
     plotCanvas.bind("plothover", function (event, pos, item) {
